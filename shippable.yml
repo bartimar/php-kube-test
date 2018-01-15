@@ -4,8 +4,11 @@ env:
   global:
     - secure: 1JaI0kF88+MnrcK4MKigtg0PcOBUmg29tRCA49UvtSFMswOE3q0lArBdW/P+9FCzfBkyHCdUxrsN49Xk0cXX2Fku6k6mBDuvjPBgB1dEj/qaDcMinYukWJIMMqr09hcJNkzmN9vMM6aC1L3pk+WjaFXo4OlnQuRLjJiTUpHB36vUIROzi+CgFQbh3JxmBqFtZhjM2oiX1zFjIWKEpcKUaZQUz6FMFb64KWedzyY3dMeTpt8KQ/JCmNd0NdfTShnqjpWpnfCO6lSQrtVxZ0mA/Wjbyityx1TlNLRnCXGO0D6eraLaTcHFHSLhL4aaQDkOt0iB7vLpZmiiYa3Pwm5jsA==
     - GCR_BASE="eu.gcr.io/$MY_ORG"
-    - NGINX_IMAGE="${GCR_BASE}/nginx-test:${BRANCH}.${BUILD_NUMBER}"
-    - PHP_IMAGE="${GCR_BASE}/php-test:${BRANCH}.${BUILD_NUMBER}"
+    - IMAGE_TAG="${BRANCH}.${BUILD_NUMBER}"
+    - NGINX_IMAGE_NAME="nginx-test"
+    - PHP_IMAGE_NAME="php-test""
+    - NGINX_IMAGE="${GCR_BASE}/${NGINX_IMAGE_NAME}:${IMAGE_TAG}"
+    - PHP_IMAGE="${GCR_BASE}/${PHP_IMAGE_NAME}:${IMAGE_TAG}"
 
 build:
   ci:
@@ -21,3 +24,76 @@ integrations:
     - integrationName: gcloud-integration    #replace with your subscription integration name
       type: gcloudKey
 
+resources:
+  - name: deploy-kubernetes-multi-container-nginx-image
+    type: image
+    integration: gcloud-integration    #replace with your Docker Hub integration name
+    pointer:
+      sourceName: "$NGINX_IMAGE_NAME"  #replace with your image name on Docker Hub
+    seed:
+      versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
+    flags:
+      - deploy-kubernetes-multi-container
+
+  - name: deploy-kubernetes-multi-container-php-image
+    type: image
+    integration: gcloud-integration
+    pointer:
+      sourceName: "${GCR_BASE}/${PHP_IMAGE_NAME}/$PHP_IMAGE_NAME"
+    seed:
+      versionName: "${IMAGE_TAG}"
+    flags:
+      - deploy-kubernetes-multi-container
+
+#kubernetes cluster
+  - name: mc-kube-cluster
+    type: cluster
+    integration: gcloud-integration    #replace with your Kubernetes integration name
+    flags:
+      - deploy-kubernetes-multi-container
+
+jobs:
+
+  ###################################
+  # runCI job to update the image tag
+  ###################################
+  - name: deploy-kubernetes-multi-container_runCI
+    type: runCI
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - OUT: deploy-kubernetes-multi-container-nginx-image
+  
+  ########################################
+  # Two images, two manifests, two deploys
+  ########################################
+
+  - name: deploy-kubernetes-multi-container-manifest-3a
+    type: manifest
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+     - IN: deploy-kubernetes-multi-container-nginx-image
+
+  - name: deploy-kubernetes-multi-container-manifest-3b
+    type: manifest
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - IN: deploy-kubernetes-multi-container-php-image
+
+  - name: dkmc-deploy-3a
+    type: deploy
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - IN: deploy-kubernetes-multi-container-manifest-3a
+      - IN: mc-kube-cluster
+
+  - name: dkmc-deploy-3b
+    type: deploy
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - IN: deploy-kubernetes-multi-container-manifest-3b
+      - IN: mc-kube-cluster
