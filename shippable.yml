@@ -3,6 +3,7 @@ language: php
 env:
   global:
     - secure: 1JaI0kF88+MnrcK4MKigtg0PcOBUmg29tRCA49UvtSFMswOE3q0lArBdW/P+9FCzfBkyHCdUxrsN49Xk0cXX2Fku6k6mBDuvjPBgB1dEj/qaDcMinYukWJIMMqr09hcJNkzmN9vMM6aC1L3pk+WjaFXo4OlnQuRLjJiTUpHB36vUIROzi+CgFQbh3JxmBqFtZhjM2oiX1zFjIWKEpcKUaZQUz6FMFb64KWedzyY3dMeTpt8KQ/JCmNd0NdfTShnqjpWpnfCO6lSQrtVxZ0mA/Wjbyityx1TlNLRnCXGO0D6eraLaTcHFHSLhL4aaQDkOt0iB7vLpZmiiYa3Pwm5jsA==
+    - secure: ipt8NHSWMfWoUj80kyvF57tVQ32brAwBIOEs7o30aV0WX/gmojneZhOH9MEB3N/uN+chP4ExFSZnMszQ8xVsV0P5tQPeMwXuYQB64+9zCW3F1UBoy9XcWy4iYAWUdnxjPzYdwFwXMKUTYgHG/5iWH4zJs8kq44lBDsoZLdr2zODmtO/DLdn811OOAqKiRVyvapQ4zjnvhsJ/YUt7GhLsPdF5in4E7hQU2DUqUYut1inEKM86bGpPcmq0w8o1mH2Byhw1Gne7uJNLKHFIXlmHDK6t0Gz127SXtaUiklu9jyaT3aYgxsvNAOAaYA6WAmP9gY28tmaIfnEjPkgl3DfWng==
     - GCR_BASE="eu.gcr.io/$MY_ORG"
     - IMAGE_TAG="${BRANCH}.${BUILD_NUMBER}"
     - NGINX_IMAGE_NAME="nginx-test"
@@ -49,8 +50,9 @@ resources:
   - name: mc-kube-cluster
     type: cluster
     integration: gcloud-integration    #replace with your Kubernetes integration name
-    flags:
-      - deploy-kubernetes-multi-container
+    pointer:
+      sourceName: "$GKE_CLUSTER_NAME"
+      region: "$GKE_REGION"
 
 jobs:
   - name: deploy-kubernetes-multi-container-manifest-3a
