@@ -1,0 +1,10 @@
+language: php
+
+build:
+  ci:
+    - docker build -t nginx-test nginx/Dockerfile
+    - docker build -t php-test php-fpm/Dockerfile
+    - kubectl version
+    - kubectl get all
+
+
