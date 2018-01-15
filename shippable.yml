@@ -2,8 +2,10 @@ language: php
 
 build:
   ci:
-    - docker build -t nginx-test nginx-Dockerfile
-    - docker build -t php-test php-Dockerfile
+    - cp nginx-Dockerfile Dockerfile 
+    - docker build -t nginx-test . 
+    - cp php-Dockerfile Dockerfile
+    - docker build -t php-test
     - kubectl version
     - kubectl get all
 
