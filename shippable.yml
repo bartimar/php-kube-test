@@ -52,7 +52,6 @@ resources:
     integration: gcloud-integration    #replace with your Kubernetes integration name
     pointer:
       sourceName: "$GKE_CLUSTER_NAME"
-      region: "$GKE_REGION"
 
 jobs:
   - name: deploy-kubernetes-multi-container-manifest-3a
