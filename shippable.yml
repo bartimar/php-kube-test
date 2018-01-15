@@ -5,7 +5,7 @@ build:
     - cp nginx-Dockerfile Dockerfile 
     - docker build -t nginx-test . 
     - cp php-Dockerfile Dockerfile
-    - docker build -t php-test
+    - docker build -t php-test .
     - kubectl version
     - kubectl get all
 
