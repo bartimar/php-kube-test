@@ -1,12 +1,23 @@
 language: php
 
+env:
+  global:
+    - secure: 1JaI0kF88+MnrcK4MKigtg0PcOBUmg29tRCA49UvtSFMswOE3q0lArBdW/P+9FCzfBkyHCdUxrsN49Xk0cXX2Fku6k6mBDuvjPBgB1dEj/qaDcMinYukWJIMMqr09hcJNkzmN9vMM6aC1L3pk+WjaFXo4OlnQuRLjJiTUpHB36vUIROzi+CgFQbh3JxmBqFtZhjM2oiX1zFjIWKEpcKUaZQUz6FMFb64KWedzyY3dMeTpt8KQ/JCmNd0NdfTShnqjpWpnfCO6lSQrtVxZ0mA/Wjbyityx1TlNLRnCXGO0D6eraLaTcHFHSLhL4aaQDkOt0iB7vLpZmiiYa3Pwm5jsA==
+    - GCR_BASE="eu.gcr.io/$MY_ORG"
+    - NGINX_IMAGE="${GCR_BASE}/nginx-test:${BRANCH}.${BUILD_NUMBER}"
+    - PHP_IMAGE="${GCR_BASE}/php-test:${BRANCH}.${BUILD_NUMBER}"
+
 build:
   ci:
     - cp nginx-Dockerfile Dockerfile 
-    - docker build -t nginx-test . 
+    - docker build -t "$NGINX_IMAGE" . 
     - cp php-Dockerfile Dockerfile
-    - docker build -t php-test .
-    - kubectl version
-    - kubectl get all
-
+    - docker build -t "$PHP_IMAGE" .
+  post_ci:
+    - docker push "$NGINX_IMAGE"
+    - docker push "$PHP_IMAGE"
+integrations:
+  hub:
+    - integrationName: gcloud-integration    #replace with your subscription integration name
+      type: gcloudKey
 
