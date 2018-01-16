@@ -37,7 +37,7 @@ resources:
     pointer:
       sourceName: "${GCR_BASE}/${NGINX_IMAGE_NAME}"  #replace with your image name on Docker Hub
     seed:
-      versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
+      versionName: "master.1"  #replace with your image tag on Docker Hub
     flags:
       - php-kube-test
 
@@ -47,7 +47,7 @@ resources:
     pointer:
       sourceName: "${GCR_BASE}/${PHP_IMAGE_NAME}"
     seed:
-      versionName: "${IMAGE_TAG}"
+      versionName: "master.1"
     flags:
       - php-kube-test
 
