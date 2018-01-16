@@ -1,5 +1,10 @@
 language: php
 
+
+branches:
+  only:
+    - master
+
 env:
   global:
     - secure: Yk7231s0euUDsS4An/05ImAFdUrFw8PVjCLB1CBpa9Gzq15j2T2A7npJxYyoy1QBmltffd7sxFqH98w/x4ooyz6AUyyG+l3XreN+/V1OqxUqmeHpHGhXoxxTF1WXo/NTHUBH9sLZtBMd6CCOUOlTZ+5mTV6Y4Grd9GNCAtfOj85uu5/Co01O3xAygBFTuO3bF/SuVopuWehXrtMPTY1DN9Rfz6uQ7Mw240RW7BLHQcm0VVVauVmzoiKAIXNKbfViyIeRtZixGHcAg4LO9UWQed7YCcBO9gbT9gPJvhGctoG/5lYiS10peqQfueif83YaNNsJBNZ8RVqAhFq/iXzDZQ==
