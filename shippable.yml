@@ -34,23 +34,23 @@ resources:
     seed:
       versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
 
-  - name: mc-kube-cluster
-    type: cluster
-    integration: gcloud-integration    #replace with your Kubernetes integration name
-    pointer:
-      sourceName: "$GKE_CLUSTER_NAME"
-      region: "$GKE_REGION"
-      namespace: "test"
+#  - name: mc-kube-cluster
+#    type: cluster
+#    integration: gcloud-integration    #replace with your Kubernetes integration name
+#    pointer:
+#      sourceName: "$GKE_CLUSTER_NAME"
+#      region: "$GKE_REGION"
+#      namespace: "test"
 
-jobs:
-  - name: deploy-kubernetes-multi-container-manifest-3a
-    type: manifest
-    steps:
-     - IN: deploy-kubernetes-multi-container-nginx-image
+#jobs:
+#  - name: deploy-kubernetes-multi-container-manifest-3a
+#    type: manifest
+#    steps:
+#     - IN: deploy-kubernetes-multi-container-nginx-image
 
-  - name: dkmc-deploy-3a
-    type: deploy
-    steps:
-      - IN: deploy-kubernetes-multi-container-manifest-3a
-      - IN: mc-kube-cluster
+#  - name: dkmc-deploy-3a
+#    type: deploy
+#    steps:
+#      - IN: deploy-kubernetes-multi-container-manifest-3a
+#      - IN: mc-kube-cluster
 
