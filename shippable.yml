@@ -21,9 +21,10 @@ build:
     - docker build -t "$NGINX_IMAGE" . 
     - cp php-Dockerfile Dockerfile
     - docker build -t "$PHP_IMAGE" .
-  post_ci:
     - docker push "$NGINX_IMAGE"
     - docker push "$PHP_IMAGE"
+    - echo "versionName=$BRANCH.$BUILD_NUMBER" >> $JOB_STATE/php-kube-test-nginx-image.env
+    - echo "versionName=$BRANCH.$BUILD_NUMBER" >> $JOB_STATE/php-kube-test-php-image.env
 integrations:
   hub:
     - integrationName: gcloud-integration    #replace with your subscription integration name
