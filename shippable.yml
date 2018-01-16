@@ -59,20 +59,6 @@ resources:
 
 jobs:
 
-  - name: deploy-kubernetes-multi-container_runCI
-    type: runCI
-    flags:
-      - deploy-kubernetes-multi-container
-    steps:
-      - OUT: deploy-kubernetes-multi-container-nginx-image
-
-  - name: deploy-kubernetes-multi-container-php_runCI
-    type: runCI
-    flags:
-      - deploy-kubernetes-multi-container
-    steps:
-      - OUT: deploy-kubernetes-multi-container-php-image
-
   - name: deploy-kubernetes-multi-container-manifest-1
     type: manifest
     flags:
@@ -88,5 +74,3 @@ jobs:
     steps:
       - IN: deploy-kubernetes-multi-container-manifest-1
       - IN: mc-kube-cluster
-      - TASK: managed
-        deployMethod: replace
