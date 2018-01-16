@@ -2,45 +2,88 @@ language: php
 
 env:
   global:
+    - secure: 1JaI0kF88+MnrcK4MKigtg0PcOBUmg29tRCA49UvtSFMswOE3q0lArBdW/P+9FCzfBkyHCdUxrsN49Xk0cXX2Fku6k6mBDuvjPBgB1dEj/qaDcMinYukWJIMMqr09hcJNkzmN9vMM6aC1L3pk+WjaFXo4OlnQuRLjJiTUpHB36vUIROzi+CgFQbh3JxmBqFtZhjM2oiX1zFjIWKEpcKUaZQUz6FMFb64KWedzyY3dMeTpt8KQ/JCmNd0NdfTShnqjpWpnfCO6lSQrtVxZ0mA/Wjbyityx1TlNLRnCXGO0D6eraLaTcHFHSLhL4aaQDkOt0iB7vLpZmiiYa3Pwm5jsA==
+    - secure: ipt8NHSWMfWoUj80kyvF57tVQ32brAwBIOEs7o30aV0WX/gmojneZhOH9MEB3N/uN+chP4ExFSZnMszQ8xVsV0P5tQPeMwXuYQB64+9zCW3F1UBoy9XcWy4iYAWUdnxjPzYdwFwXMKUTYgHG/5iWH4zJs8kq44lBDsoZLdr2zODmtO/DLdn811OOAqKiRVyvapQ4zjnvhsJ/YUt7GhLsPdF5in4E7hQU2DUqUYut1inEKM86bGpPcmq0w8o1mH2Byhw1Gne7uJNLKHFIXlmHDK6t0Gz127SXtaUiklu9jyaT3aYgxsvNAOAaYA6WAmP9gY28tmaIfnEjPkgl3DfWng==
+    - GCR_BASE="eu.gcr.io/$MY_ORG"
     - IMAGE_TAG="${BRANCH}.${BUILD_NUMBER}"
     - NGINX_IMAGE_NAME="nginx-test"
-    - PHP_IMAGE_NAME="php-test""
+    - PHP_IMAGE_NAME="php-test"
+    - NGINX_IMAGE="${GCR_BASE}/${NGINX_IMAGE_NAME}:${IMAGE_TAG}"
+    - PHP_IMAGE="${GCR_BASE}/${PHP_IMAGE_NAME}:${IMAGE_TAG}"
 
 build:
   ci:
     - cp nginx-Dockerfile Dockerfile 
+    - docker build -t "$NGINX_IMAGE" . 
     - cp php-Dockerfile Dockerfile
+    - docker build -t "$PHP_IMAGE" .
+  post_ci:
+    - docker push "$NGINX_IMAGE"
+    - docker push "$PHP_IMAGE"
 integrations:
   hub:
     - integrationName: gcloud-integration    #replace with your subscription integration name
       type: gcloudKey
 
-#resources:
-#  - name: deploy-kubernetes-multi-container-nginx-image
-#    type: image
-#    integration: gcloud-integration    #replace with your Docker Hub integration name
-#    pointer:
-#      sourceName: "${GCR_BASE}/${NGINX_IMAGE_NAME}"  #replace with your image name on Docker Hub
-#    seed:
-#      versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
+resources:
+  - name: deploy-kubernetes-multi-container-nginx-image
+    type: image
+    integration: gcloud-integration    #replace with your Docker Hub integration name
+    pointer:
+      sourceName: "${GCR_BASE}/${NGINX_IMAGE_NAME}"  #replace with your image name on Docker Hub
+    seed:
+      versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
+    flags:
+      - deploy-kubernetes-multi-container
 
-#  - name: mc-kube-cluster
-#    type: cluster
-#    integration: gcloud-integration    #replace with your Kubernetes integration name
-#    pointer:
-#      sourceName: "$GKE_CLUSTER_NAME"
-#      region: "$GKE_REGION"
-#      namespace: "test"
+  - name: deploy-kubernetes-multi-container-php-image
+    type: image
+    integration: gcloud-integration
+    pointer:
+      sourceName: "${GCR_BASE}/${PHP_IMAGE_NAME}"
+    seed:
+      versionName: "${IMAGE_TAG}"
+    flags:
+      - deploy-kubernetes-multi-container
 
-#jobs:
-#  - name: deploy-kubernetes-multi-container-manifest-3a
-#    type: manifest
-#    steps:
-#     - IN: deploy-kubernetes-multi-container-nginx-image
+#kubernetes cluster
+  - name: mc-kube-cluster
+    type: cluster
+    integration: gcloud-integration    #replace with your Kubernetes integration name
+    pointer:
+      sourceName: "$GKE_CLUSTER_NAME"
+      region: "$GKE_REGION"
+      namespace: "test"
+    flags:
+     - deploy-kubernetes-multi-container
 
-#  - name: dkmc-deploy-3a
-#    type: deploy
-#    steps:
-#      - IN: deploy-kubernetes-multi-container-manifest-3a
-#      - IN: mc-kube-cluster
+jobs:
+  - name: deploy-kubernetes-multi-container-manifest-3a
+    type: manifest
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+     - IN: deploy-kubernetes-multi-container-nginx-image
 
+  - name: deploy-kubernetes-multi-container-manifest-3b
+    type: manifest
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - IN: deploy-kubernetes-multi-container-php-image
+
+  - name: dkmc-deploy-3a
+    type: deploy
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - IN: deploy-kubernetes-multi-container-manifest-3a
+      - IN: mc-kube-cluster
+
+  - name: dkmc-deploy-3b
+    type: deploy
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - IN: deploy-kubernetes-multi-container-manifest-3b
+      - IN: mc-kube-cluster
