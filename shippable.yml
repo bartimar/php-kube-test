@@ -33,53 +33,24 @@ resources:
       sourceName: "${GCR_BASE}/${NGINX_IMAGE_NAME}"  #replace with your image name on Docker Hub
     seed:
       versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
-    flags:
-      - deploy-kubernetes-multi-container
 
-  - name: deploy-kubernetes-multi-container-php-image
-    type: image
-    integration: gcloud-integration
-    pointer:
-      sourceName: "${GCR_BASE}/${PHP_IMAGE_NAME}"
-    seed:
-      versionName: "${IMAGE_TAG}"
-    flags:
-      - deploy-kubernetes-multi-container
-
-#kubernetes cluster
   - name: mc-kube-cluster
     type: cluster
     integration: gcloud-integration    #replace with your Kubernetes integration name
     pointer:
       sourceName: "$GKE_CLUSTER_NAME"
+      region: "$GKE_REGION"
+      namespace: "test"
 
 jobs:
   - name: deploy-kubernetes-multi-container-manifest-3a
     type: manifest
-    flags:
-      - deploy-kubernetes-multi-container
     steps:
      - IN: deploy-kubernetes-multi-container-nginx-image
 
-  - name: deploy-kubernetes-multi-container-manifest-3b
-    type: manifest
-    flags:
-      - deploy-kubernetes-multi-container
-    steps:
-      - IN: deploy-kubernetes-multi-container-php-image
-
   - name: dkmc-deploy-3a
     type: deploy
-    flags:
-      - deploy-kubernetes-multi-container
     steps:
       - IN: deploy-kubernetes-multi-container-manifest-3a
       - IN: mc-kube-cluster
 
-  - name: dkmc-deploy-3b
-    type: deploy
-    flags:
-      - deploy-kubernetes-multi-container
-    steps:
-      - IN: deploy-kubernetes-multi-container-manifest-3b
-      - IN: mc-kube-cluster
