@@ -25,14 +25,14 @@ integrations:
     - integrationName: gcloud-integration    #replace with your subscription integration name
       type: gcloudKey
 
-resources:
-  - name: deploy-kubernetes-multi-container-nginx-image
-    type: image
-    integration: gcloud-integration    #replace with your Docker Hub integration name
-    pointer:
-      sourceName: "${GCR_BASE}/${NGINX_IMAGE_NAME}"  #replace with your image name on Docker Hub
-    seed:
-      versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
+#resources:
+#  - name: deploy-kubernetes-multi-container-nginx-image
+#    type: image
+#    integration: gcloud-integration    #replace with your Docker Hub integration name
+#    pointer:
+#      sourceName: "${GCR_BASE}/${NGINX_IMAGE_NAME}"  #replace with your image name on Docker Hub
+#    seed:
+#      versionName: "${IMAGE_TAG}"  #replace with your image tag on Docker Hub
 
 #  - name: mc-kube-cluster
 #    type: cluster
