@@ -57,6 +57,13 @@ resources:
      - deploy-kubernetes-multi-container
 
 jobs:
+  - name: php-kube-test_runCI
+    type: runCI
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - OUT: deploy-kubernetes-multi-container-nginx-image
+      - OUT: deploy-kubernetes-multi-container-php-image
 
   - name: deploy-kubernetes-multi-container-manifest-1
     type: manifest
