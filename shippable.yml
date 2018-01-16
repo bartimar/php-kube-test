@@ -58,32 +58,41 @@ resources:
      - deploy-kubernetes-multi-container
 
 jobs:
-  - name: deploy-kubernetes-multi-container-manifest-3a
+
+  - name: deploy-kubernetes-multi-container_runCI
+    type: runCI
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - OUT: deploy-kubernetes-multi-container-nginx-image
+
+  - name: deploy-kubernetes-multi-container-php_runCI
+    type: runCI
+    flags:
+      - deploy-kubernetes-multi-container
+    steps:
+      - OUT: deploy-kubernetes-multi-container-php-image
+
+  - name: deploy-kubernetes-multi-container-manifest-2a
     type: manifest
     flags:
       - deploy-kubernetes-multi-container
     steps:
      - IN: deploy-kubernetes-multi-container-nginx-image
 
-  - name: deploy-kubernetes-multi-container-manifest-3b
+  - name: deploy-kubernetes-multi-container-manifest-2b
     type: manifest
     flags:
       - deploy-kubernetes-multi-container
     steps:
       - IN: deploy-kubernetes-multi-container-php-image
 
-  - name: dkmc-deploy-3a
+  - name: dkmc-deploy-2
     type: deploy
+    workflow: parallel
     flags:
       - deploy-kubernetes-multi-container
     steps:
-      - IN: deploy-kubernetes-multi-container-manifest-3a
-      - IN: mc-kube-cluster
-
-  - name: dkmc-deploy-3b
-    type: deploy
-    flags:
-      - deploy-kubernetes-multi-container
-    steps:
-      - IN: deploy-kubernetes-multi-container-manifest-3b
+      - IN: deploy-kubernetes-multi-container-manifest-2a
+      - IN: deploy-kubernetes-multi-container-manifest-2b
       - IN: mc-kube-cluster
